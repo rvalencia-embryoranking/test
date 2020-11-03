@@ -1,0 +1,1103 @@
+{
+  "openapi" : "3.0.0",
+  "tags" : [ {
+    "name" : "Cycles endpoints"
+  } ],
+  "info" : {
+    "title" : "ERICA API",
+    "version" : "1.0",
+    "description" : "ERICA is the most advanced artificial intelligence system for the ranking of embryos in IVF in the world. Its Deep Learning algorithm has reached a success rate of up to 92.5%, surpassing any other method used before by embryologists.\n\nWith ERICA, the lab of your fertility center can provide your patients with the best chance of positive Beta pregnancy test.\n\nWith this API you can request the ranking of one or several embryos in a cycle uploading blastocyst micrographs and patient's data.",
+    "contact" : {
+      "name" : "Support",
+      "url" : "https://embryoranking.com",
+      "email" : "r.valencia@embryoranking.com"
+    }
+  },
+  "servers" : [ {
+    "url" : "Not available",
+    "description" : "Server not available"
+  } ],
+  "paths" : {
+    "/cycles" : {
+      "post" : {
+        "summary" : "Upload cycle information",
+        "operationId" : "post-cycles",
+        "responses" : {
+          "201" : {
+            "description" : "Created",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "code" : {
+                      "type" : "string",
+                      "description" : "HTTP status code",
+                      "example" : 201
+                    },
+                    "name" : {
+                      "type" : "string",
+                      "description" : "Name of HTTP status code",
+                      "example" : "Created"
+                    },
+                    "message" : {
+                      "type" : "string",
+                      "example" : "Cycle successfully uploaded"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/401"
+                }
+              }
+            }
+          }
+        },
+        "description" : "Upload data and blastocysts micrographs or embryoscope videos to ERICA. Micrographs and videos must be in a server accesible by ERICA for downloading. After a succeful uploading ERICA will start processing the cycle.",
+        "tags" : [ "Cycles endpoints" ],
+        "security" : [ {
+          "x-api-key" : [ ]
+        } ],
+        "requestBody" : {
+          "required" : true,
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "type" : "object",
+                "properties" : {
+                  "id_cycle" : {
+                    "type" : "string",
+                    "description" : "A unique identifyer for the cycle. This parameter is case sensitive",
+                    "example" : "ABCDEFG1233876"
+                  },
+                  "embryos" : {
+                    "type" : "array",
+                    "description" : "Array of embryos of the cycle",
+                    "items" : {
+                      "type" : "object",
+                      "description" : "Data of embryo",
+                      "properties" : {
+                        "id_embryo" : {
+                          "type" : "string",
+                          "description" : "Unique ID of the embryo. This parameter is case sensitive",
+                          "example" : 90847109837
+                        },
+                        "patient_age" : {
+                          "type" : "integer",
+                          "minimum" : 18,
+                          "maximum" : 60,
+                          "description" : "Patient's age in years at the moment of the oocyte extraction",
+                          "example" : 32
+                        },
+                        "microscope" : {
+                          "type" : "string",
+                          "description" : "Microscope code used to take the micrograph of the blastocyst. This is a unique code created and assigned to each of the microscopes of your laboratory when your clinic is registered for using ERICA.",
+                          "example" : "NHGDL20X"
+                        },
+                        "ins_pic_time" : {
+                          "type" : "integer",
+                          "minimum" : 108,
+                          "maximum" : 192,
+                          "description" : "Time in hours of insemination to picture.",
+                          "example" : 110
+                        },
+                        "image" : {
+                          "type" : "string",
+                          "description" : "URL to micrograph or video. This URL will be used by the API to download the image or video to the server.",
+                          "example" : "https://myserver.com/embryoimages/embryo1.png"
+                        },
+                        "pgt" : {
+                          "type" : "object",
+                          "description" : "If PGT was conducted specify the results.",
+                          "properties" : {
+                            "type_study" : {
+                              "type" : "string",
+                              "description" : "Indicate the type of study. Valid values: invasive or non-invasive. This parameter is not case sensitive",
+                              "example" : "invasive"
+                            },
+                            "result" : {
+                              "type" : "string",
+                              "description" : "Result of the study. Valid values: euploid, aneuploid, mosaic, no-dna. This parameter is not case sensitive",
+                              "example" : "euploid"
+                            },
+                            "gender" : {
+                              "type" : "string",
+                              "description" : "Gender of embryo",
+                              "example" : "XX"
+                            },
+                            "aneuploidy_type" : {
+                              "type" : "string",
+                              "description" : "Aneuploidy type, e.g. +11, -2, XXX, complex",
+                              "example" : "XXX"
+                            }
+                          }
+                        }
+                      },
+                      "required" : [ "id_embryo", "patient_age", "microscope", "ins_pic_time", "image" ]
+                    }
+                  }
+                },
+                "required" : [ "id_cycle", "embryos" ]
+              },
+              "examples" : {
+                "cycle-example" : {
+                  "value" : {
+                    "id_cycle" : "ABCDEFG1233876",
+                    "embryos" : [ {
+                      "id_embryo" : 90847109837,
+                      "patient_age" : 32,
+                      "microscope" : "NHGDL20X",
+                      "ins_pic_time" : 110,
+                      "image" : "https://myserver.com/embryoimages/embryo1.png",
+                      "pgt" : {
+                        "type_study" : "invasive",
+                        "result" : "euploid",
+                        "gender" : "XX"
+                      }
+                    }, {
+                      "id_embryo" : 64718349198,
+                      "patient_age" : 32,
+                      "microscope" : "NHGDL20X",
+                      "ins_pic_time" : 110,
+                      "image" : "https://myserver.com/embryoimages/embryo2.png",
+                      "pgt" : {
+                        "type_study" : "invasive",
+                        "result" : "aneuploid",
+                        "aneuplody_type" : "XXX"
+                      }
+                    }, {
+                      "id_embryo" : 354684981651,
+                      "patient_age" : 32,
+                      "microscope" : "NHGDL20X",
+                      "ins_pic_time" : 110,
+                      "image" : "https://myserver.com/embryoimages/embryo3.avi",
+                      "pgt" : {
+                        "type_study" : "invasive",
+                        "result" : "euploid",
+                        "gender" : "XY"
+                      }
+                    } ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/cycles/{id_cycle}" : {
+      "parameters" : [ {
+        "schema" : {
+          "type" : "string"
+        },
+        "name" : "id_cycle",
+        "in" : "path",
+        "required" : true,
+        "description" : "ID of the requested cycle"
+      } ],
+      "get" : {
+        "summary" : "Get ranking of a cycle.",
+        "tags" : [ "Cycles endpoints" ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "status" : {
+                      "type" : "string",
+                      "description" : "Status of ranking process. Could be: \"processing\" or \"complete\"",
+                      "example" : "complete"
+                    },
+                    "embryos" : {
+                      "type" : "array",
+                      "items" : {
+                        "type" : "object",
+                        "properties" : {
+                          "id_embryo" : {
+                            "type" : "string",
+                            "description" : "ID of embryo data",
+                            "example" : 90847109837
+                          },
+                          "score" : {
+                            "type" : "number",
+                            "description" : "Score of ERICA bounded to [0 - 1]",
+                            "example" : 0.9804
+                          },
+                          "rank" : {
+                            "type" : "string",
+                            "description" : "Rank of embryo in the cycle",
+                            "example" : "A"
+                          },
+                          "prognosis" : {
+                            "type" : "string",
+                            "description" : "Prognosis of embryo, could be Good, Fair, Regular or Bad",
+                            "example" : "Good"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "examples" : {
+                  "ranking-example" : {
+                    "value" : {
+                      "status" : "complete",
+                      "embryos" : [ {
+                        "id_embryo" : 90847109837,
+                        "score" : 0.98,
+                        "prognosis" : "Good"
+                      }, {
+                        "id_embryo" : 64718349198,
+                        "score" : 0.67,
+                        "prognosis" : "Bad"
+                      }, {
+                        "id_embryo" : 354684981651,
+                        "score" : 0.68,
+                        "prognosis" : "Fair"
+                      } ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/401"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/404"
+                }
+              }
+            }
+          }
+        },
+        "operationId" : "get-cycles-id_cycle",
+        "description" : "Get ranking of a cycle. It could be that at the momment of requesting a ranking, ERICA has not finished analazing the data, in that case, the status value in the response would be \"processing\", and the scores, rank and prognosis would show the default values: 0.0, A, \"Good\". And . If ERICA finished the analysis of the data the status would be \"complete\" and the score, rank and progonis would be the results of ERICA",
+        "security" : [ {
+          "x-api-key" : [ ]
+        } ]
+      },
+      "put" : {
+        "summary" : "Update cycle information",
+        "operationId" : "update-cycles-id_cycle.",
+        "requestBody" : {
+          "required" : true,
+          "description" : "This request will override the existing values of cycle information. If optional values were included when the cycle information were uploaded they must be incluided in the request body, if not, these values will be deleted.",
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "type" : "object",
+                "properties" : {
+                  "embryos" : {
+                    "type" : "array",
+                    "description" : "The array of embryos of the cycle that are going to be modified",
+                    "items" : {
+                      "type" : "object",
+                      "description" : "Data of embryo",
+                      "properties" : {
+                        "id_embryo" : {
+                          "type" : "string",
+                          "description" : "Unique ID of the embryo. This parameter is case sensitive",
+                          "example" : 90847109837
+                        },
+                        "patient_age" : {
+                          "type" : "integer",
+                          "minimum" : 18,
+                          "maximum" : 60,
+                          "description" : "Patient's age in years at the moment of the oocyte extraction",
+                          "example" : 32
+                        },
+                        "microscope" : {
+                          "type" : "string",
+                          "description" : "Microscope code used to take the micrograph of the blastocyst. This is a unique code created and assigned to each of the microscopes of your laboratory when your clinic is registered for using ERICA.",
+                          "example" : "NHGDL20X"
+                        },
+                        "ins_pic_time" : {
+                          "type" : "integer",
+                          "minimum" : 108,
+                          "maximum" : 192,
+                          "description" : "Time in hours of insemination to picture.",
+                          "example" : 110
+                        },
+                        "image" : {
+                          "type" : "string",
+                          "description" : "URL to micrograph or video. This URL will be used by the API to download the image or video to the server.",
+                          "example" : "https://myserver.com/embryoimages/embryo1.png"
+                        },
+                        "pgt" : {
+                          "type" : "object",
+                          "description" : "If PGT was conducted specify the results.",
+                          "properties" : {
+                            "type_study" : {
+                              "type" : "string",
+                              "description" : "Indicate the type of study. Valid values: invasive or non-invasive. This parameter is not case sensitive",
+                              "example" : "invasive"
+                            },
+                            "result" : {
+                              "type" : "string",
+                              "description" : "Result of the study. Valid values: euploid, aneuploid, mosaic, no-dna. This parameter is not case sensitive",
+                              "example" : "euploid"
+                            },
+                            "gender" : {
+                              "type" : "string",
+                              "description" : "Gender of embryo",
+                              "example" : "XX"
+                            },
+                            "aneuploidy_type" : {
+                              "type" : "string",
+                              "description" : "Aneuploidy type, e.g. +11, -2, XXX, complex",
+                              "example" : "XXX"
+                            }
+                          }
+                        }
+                      },
+                      "required" : [ "id_embryo", "patient_age", "microscope", "ins_pic_time", "image" ]
+                    }
+                  }
+                },
+                "required" : [ "id_cycle", "embryos" ]
+              },
+              "examples" : {
+                "cycle-example" : {
+                  "value" : {
+                    "embryos" : [ {
+                      "id_embryo" : 90847109837,
+                      "patient_age" : 32,
+                      "microscope" : "NHGDL20X",
+                      "ins_pic_time" : 110,
+                      "image" : "https://myserver.com/embryoimages/embryo1.png",
+                      "pgt" : {
+                        "type_study" : "invasive",
+                        "result" : "euploid",
+                        "gender" : "XX"
+                      }
+                    }, {
+                      "id_embryo" : 64718349198,
+                      "patient_age" : 32,
+                      "microscope" : "NHGDL20X",
+                      "ins_pic_time" : 110,
+                      "image" : "https://myserver.com/embryoimages/embryo2.avi",
+                      "pgt" : {
+                        "type_study" : "invasive",
+                        "result" : "aneuploid",
+                        "aneuploidy_type" : "+11"
+                      }
+                    }, {
+                      "id_embryo" : 354684981651,
+                      "patient_age" : 32,
+                      "microscope" : "NHGDL20X",
+                      "ins_pic_time" : 110,
+                      "image" : "https://myserver.com/embryoimages/embryo3.png",
+                      "pgt" : {
+                        "type_study" : "invasive",
+                        "result" : "euploid",
+                        "gender" : "XX"
+                      }
+                    } ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "code" : {
+                      "type" : "string",
+                      "example" : 200
+                    },
+                    "name" : {
+                      "type" : "string",
+                      "example" : "Updated"
+                    },
+                    "message" : {
+                      "type" : "string",
+                      "example" : "Cycle successfully updated"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/401"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/404"
+                }
+              }
+            }
+          }
+        },
+        "description" : "Update embryo information in a cycle",
+        "security" : [ {
+          "x-api-key" : [ ]
+        } ],
+        "tags" : [ "Cycles endpoints" ]
+      },
+      "delete" : {
+        "summary" : "Delete cycle information",
+        "operationId" : "delete_cycle.",
+        "description" : "Deletes the information of the cycle and embryo related to it.",
+        "tags" : [ "Cycles endpoints" ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "code" : {
+                      "type" : "string",
+                      "example" : 200
+                    },
+                    "name" : {
+                      "type" : "string",
+                      "example" : "Updated"
+                    },
+                    "message" : {
+                      "type" : "string",
+                      "example" : "Cycle successfully deleted"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/401"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/404"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "x-api-key" : [ ]
+        } ]
+      }
+    },
+    "/cycles/{id_cycle}/embryos" : {
+      "parameters" : [ {
+        "schema" : {
+          "type" : "string"
+        },
+        "name" : "id_cycle",
+        "in" : "path",
+        "required" : true,
+        "description" : "ID of the requested cycle"
+      } ],
+      "put" : {
+        "summary" : "Update cycle information",
+        "operationId" : "update-embryos-id_cycle.",
+        "requestBody" : {
+          "required" : true,
+          "description" : "This request will update the existing values of a batch of embryos of a cycle. Embryos of the cycle not included in batch will not be altered.",
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "type" : "object",
+                "properties" : {
+                  "embryos" : {
+                    "type" : "array",
+                    "description" : "The array of embryos of the cycle that are going to be modified",
+                    "items" : {
+                      "type" : "object",
+                      "description" : "Data of embryo",
+                      "properties" : {
+                        "id_embryo" : {
+                          "type" : "string",
+                          "description" : "Unique ID of the embryo. This parameter is case sensitive",
+                          "example" : 90847109837
+                        },
+                        "patient_age" : {
+                          "type" : "integer",
+                          "minimum" : 18,
+                          "maximum" : 60,
+                          "description" : "Patient's age in years at the moment of the oocyte extraction",
+                          "example" : 32
+                        },
+                        "microscope" : {
+                          "type" : "string",
+                          "description" : "Microscope code used to take the micrograph of the blastocyst. This is a unique code created and assigned to each of the microscopes of your laboratory when your clinic is registered for using ERICA.",
+                          "example" : "NHGDL20X"
+                        },
+                        "ins_pic_time" : {
+                          "type" : "integer",
+                          "minimum" : 108,
+                          "maximum" : 192,
+                          "description" : "Time in hours of insemination to picture.",
+                          "example" : 110
+                        },
+                        "image" : {
+                          "type" : "string",
+                          "description" : "URL to micrograph or video. This URL will be used by the API to download the image or video to the server.",
+                          "example" : "https://myserver.com/embryoimages/embryo1.png"
+                        },
+                        "pgt" : {
+                          "type" : "object",
+                          "description" : "If PGT was conducted specify the results.",
+                          "properties" : {
+                            "type_study" : {
+                              "type" : "string",
+                              "description" : "Indicate the type of study. Valid values: invasive or non-invasive. This parameter is not case sensitive",
+                              "example" : "invasive"
+                            },
+                            "result" : {
+                              "type" : "string",
+                              "description" : "Result of the study. Valid values: euploid, aneuploid, mosaic, no-dna. This parameter is not case sensitive",
+                              "example" : "euploid"
+                            },
+                            "gender" : {
+                              "type" : "string",
+                              "description" : "Gender of embryo",
+                              "example" : "XX"
+                            },
+                            "aneuploidy_type" : {
+                              "type" : "string",
+                              "description" : "Aneuploidy type, e.g. +11, -2, XXX, complex",
+                              "example" : "XXX"
+                            }
+                          }
+                        }
+                      },
+                      "required" : [ "id_embryo", "patient_age", "microscope", "ins_pic_time", "image" ]
+                    }
+                  }
+                },
+                "required" : [ "id_cycle", "embryos" ]
+              },
+              "examples" : {
+                "cycle-example" : {
+                  "value" : {
+                    "embryos" : [ {
+                      "id_embryo" : 90847109837,
+                      "patient_age" : 32,
+                      "microscope" : "NHGDL20X",
+                      "ins_pic_time" : 110,
+                      "image" : "https://myserver.com/embryoimages/embryo1.mp4",
+                      "pgt" : {
+                        "type_study" : "invasive",
+                        "result" : "euploid",
+                        "gender" : "XX"
+                      }
+                    }, {
+                      "id_embryo" : 64718349198,
+                      "patient_age" : 32,
+                      "microscope" : "NHGDL20X",
+                      "ins_pic_time" : 110,
+                      "image" : "https://myserver.com/embryoimages/embryo2.png",
+                      "pgt" : {
+                        "type_study" : "invasive",
+                        "result" : "aneuploid",
+                        "aneuploidy_type" : "+11"
+                      }
+                    }, {
+                      "id_embryo" : 354684981651,
+                      "patient_age" : 32,
+                      "microscope" : "NHGDL20X",
+                      "ins_pic_time" : 110,
+                      "image" : "https://myserver.com/embryoimages/embryo3.png",
+                      "pgt" : {
+                        "type_study" : "invasive",
+                        "result" : "euploid",
+                        "gender" : "XX"
+                      }
+                    } ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "code" : {
+                      "type" : "string",
+                      "example" : 200
+                    },
+                    "name" : {
+                      "type" : "string",
+                      "example" : "Updated"
+                    },
+                    "message" : {
+                      "type" : "string",
+                      "example" : "Cycle successfully updated"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/401"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/404"
+                }
+              }
+            }
+          }
+        },
+        "description" : "Update embryo information in a cycle",
+        "security" : [ {
+          "x-api-key" : [ ]
+        } ],
+        "tags" : [ "Cycles endpoints" ]
+      }
+    },
+    "/cycles/{id_cycle}/{id_embryo}" : {
+      "parameters" : [ {
+        "schema" : {
+          "type" : "string"
+        },
+        "name" : "id_cycle",
+        "in" : "path",
+        "required" : true,
+        "description" : "ID of the requested cycle"
+      }, {
+        "schema" : {
+          "type" : "string"
+        },
+        "name" : "id_embryo",
+        "in" : "path",
+        "required" : true,
+        "description" : "ID of the requested embryo"
+      } ],
+      "put" : {
+        "summary" : "Update embryo information",
+        "operationId" : "update-embryo-id_cycle.",
+        "requestBody" : {
+          "required" : true,
+          "description" : "This request will update the existing values of a embryo of a cycle. Other embryos of the cycle will not be altered.",
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "type" : "object",
+                "properties" : {
+                  "patient_age" : {
+                    "type" : "integer",
+                    "minimum" : 18,
+                    "maximum" : 60,
+                    "description" : "Patient's age in years at the moment of the oocyte extraction",
+                    "example" : 32
+                  },
+                  "microscope" : {
+                    "type" : "string",
+                    "description" : "Microscope code used to take the micrograph of the blastocyst. This is a unique code created and assigned to each of the microscopes of your laboratory when your clinic is registered for using ERICA.",
+                    "example" : "NHGDL20X"
+                  },
+                  "ins_pic_time" : {
+                    "type" : "integer",
+                    "minimum" : 108,
+                    "maximum" : 192,
+                    "description" : "Time in hours of insemination to picture.",
+                    "example" : 110
+                  },
+                  "image" : {
+                    "type" : "string",
+                    "description" : "URL to micrograph or video. This URL will be used by the API to download the image or video to the server.",
+                    "example" : "https://myserver.com/embryoimages/embryo1.png"
+                  },
+                  "pgt" : {
+                    "type" : "object",
+                    "description" : "If PGT was conducted specify the results.",
+                    "properties" : {
+                      "type_study" : {
+                        "type" : "string",
+                        "description" : "Indicate the type of study. Valid values: invasive or non-invasive. This parameter is not case sensitive",
+                        "example" : "invasive"
+                      },
+                      "result" : {
+                        "type" : "string",
+                        "description" : "Result of the study. Valid values: euploid, aneuploid, mosaic, no-dna. This parameter is not case sensitive",
+                        "example" : "euploid"
+                      },
+                      "gender" : {
+                        "type" : "string",
+                        "description" : "Gender of embryo",
+                        "example" : "XX"
+                      },
+                      "aneuploidy_type" : {
+                        "type" : "string",
+                        "description" : "Aneuploidy type, e.g. +11, -2, XXX, complex",
+                        "example" : "XXX"
+                      }
+                    }
+                  }
+                },
+                "required" : [ "patient_age", "microscope", "ins_pic_time", "image" ]
+              },
+              "examples" : {
+                "cycle-example" : {
+                  "value" : {
+                    "embryos" : [ {
+                      "id_embryo" : 90847109837,
+                      "patient_age" : 32,
+                      "microscope" : "NHGDL20X",
+                      "ins_pic_time" : 110,
+                      "image" : "https://myserver.com/embryoimages/embryo1.png",
+                      "pgt" : {
+                        "type_study" : "invasive",
+                        "result" : "euploid",
+                        "gender" : "XX"
+                      }
+                    }, {
+                      "id_embryo" : 64718349198,
+                      "patient_age" : 32,
+                      "microscope" : "NHGDL20X",
+                      "ins_pic_time" : 110,
+                      "image" : "https://myserver.com/embryoimages/embryo2.png",
+                      "pgt" : {
+                        "type_study" : "invasive",
+                        "result" : "aneuploid",
+                        "aneuploidy_type" : "+11"
+                      }
+                    }, {
+                      "id_embryo" : 354684981651,
+                      "patient_age" : 32,
+                      "microscope" : "NHGDL20X",
+                      "ins_pic_time" : 110,
+                      "image" : "https://myserver.com/embryoimages/embryo3.png",
+                      "pgt" : {
+                        "type_study" : "invasive",
+                        "result" : "euploid",
+                        "gender" : "XX"
+                      }
+                    } ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "code" : {
+                      "type" : "string",
+                      "example" : 200
+                    },
+                    "name" : {
+                      "type" : "string",
+                      "example" : "Updated"
+                    },
+                    "message" : {
+                      "type" : "string",
+                      "example" : "Cycle successfully updated"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/401"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/404"
+                }
+              }
+            }
+          }
+        },
+        "description" : "Update embryo information in a cycle",
+        "security" : [ {
+          "x-api-key" : [ ]
+        } ],
+        "tags" : [ "Cycles endpoints" ]
+      },
+      "delete" : {
+        "summary" : "Delete embryo information",
+        "operationId" : "delete_embryo.",
+        "description" : "Deletes the information of an embryo",
+        "tags" : [ "Cycles endpoints" ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "properties" : {
+                    "code" : {
+                      "type" : "string",
+                      "example" : 200
+                    },
+                    "name" : {
+                      "type" : "string",
+                      "example" : "Updated"
+                    },
+                    "message" : {
+                      "type" : "string",
+                      "example" : "Embryo successfully deleted"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/400"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/401"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/404"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "x-api-key" : [ ]
+        } ]
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "400" : {
+        "title" : "400",
+        "type" : "object",
+        "properties" : {
+          "code" : {
+            "type" : "string",
+            "description" : "HTTP status code",
+            "example" : 400
+          },
+          "name" : {
+            "type" : "string",
+            "description" : "Name of HTTP status code",
+            "example" : "Bad Request"
+          },
+          "message" : {
+            "type" : "string",
+            "description" : "Message that describes the status of request.",
+            "example" : "Request body is required"
+          }
+        }
+      },
+      "401" : {
+        "title" : "401",
+        "type" : "object",
+        "properties" : {
+          "code" : {
+            "type" : "string",
+            "description" : "HTTP status code",
+            "example" : 401
+          },
+          "name" : {
+            "type" : "string",
+            "description" : "Name of HTTP status code",
+            "example" : "Unauthorized"
+          },
+          "message" : {
+            "type" : "string",
+            "description" : "Message that describes the status of request.",
+            "example" : "You're not authorized for this action"
+          }
+        },
+        "required" : [ "cod", "message" ],
+        "x-tags" : [ "response schemas" ]
+      },
+      "404" : {
+        "title" : "404",
+        "type" : "object",
+        "properties" : {
+          "code" : {
+            "type" : "string",
+            "description" : "HTTP status code",
+            "example" : 404
+          },
+          "name" : {
+            "type" : "string",
+            "description" : "Name of HTTP status code",
+            "example" : "No Found"
+          },
+          "message" : {
+            "type" : "string",
+            "description" : "Message that describes the status of request.",
+            "example" : "The resource cannot be found"
+          }
+        },
+        "x-tags" : [ "response schemas" ]
+      }
+    },
+    "securitySchemes" : {
+      "x-api-key" : {
+        "name" : "ERICA API Key",
+        "type" : "apiKey",
+        "in" : "header",
+        "description" : "API key to authorize requests"
+      }
+    }
+  },
+  "security" : [ {
+    "x-api-key" : [ ]
+  } ]
+}
